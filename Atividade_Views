@@ -1,0 +1,67 @@
+CREATE TABLE Ambulatorios(
+Numero_Ambulatorio int PRIMARY KEY,
+Andar int,
+Capacidade int
+);
+
+CREATE TABLE Medicos(
+Cod_Medico int PRIMARY KEY,
+CPF int,
+Nome varchar(100),
+Idade int,
+Cidade varchar(100),
+Especialidade varchar(100),
+Numero_Ambulatorio int REFERENCES Ambulatorios(Numero_Ambulatorio)
+);
+
+CREATE TABLE Pacientes(
+Cod_Paciente int PRIMARY KEY,
+CPF int,
+Nome varchar(100),
+Idade int,
+Cidade varchar(100),
+Doenca varchar(100)
+);
+
+CREATE TABLE Consultas(
+Cod_Medico int REFERENCES Medicos(Cod_Medico),
+Cod_Paciente int REFERENCES Pacientes(Cod_Paciente),
+Data_Consulta date,
+Hora_Consulta varchar(100),
+PRIMARY KEY(Cod_Medico, Cod_Paciente)
+);
+
+INSERT INTO Ambulatorios values(1,25,10),
+(2,26,15),
+(3,27,17);
+
+INSERT INTO Medicos values(2001,666666,'Zé',58,'Caiana','Curar Corações',1),
+(2002,777777,'Mia',11,'Dubai','Roubar',2),
+(2003,888888,'Joao de Deus',89,'Guarabira','Preciso Dizer?',3);
+
+INSERT INTO Pacientes values(21,11111,'Rael',24,'Tacima','Trombose'),
+(22,22222,'Joan',22,'Guarabira','Nasceu Preto'),
+(23,33333,'Douglas',15,'Mari','Excesso de Cabeça');
+
+INSERT INTO Consultas values(2003,21,'2019-07-25','14:00'),
+(2002,23,'2022-12-30','12:25'),
+(2001,22,'2019-10-10','15:30');
+
+create view Dados_Consulta as SELECT M.Nome as "Nome_Médico", P.Nome as "Nome_Paciente", C.Hora_Consulta from Medicos M
+INNER JOIN Consultas C on (C.Cod_Medico = M.Cod_Medico)
+INNER JOIN Pacientes P on (C.Cod_Paciente = P.Cod_Paciente);
+
+
+create view Agendamento_Consulta as SELECT C.Hora_Consulta,A.Andar,M.Cod_Medico FROM Medicos M
+INNER JOIN Ambulatorios A on (A.Numero_Ambulatorio = M.Numero_Ambulatorio)
+INNER JOIN Consultas C on (C.Cod_Medico = M.Cod_Medico);
+
+
+create view Medico_Consulta as SELECT M.Nome,C.Data_Consulta,C.Hora_Consulta From Medicos M
+inner Join Consultas C
+on(M.Cod_Medico = C.Cod_Medico);
+
+
+create view Dados_Gerais as SELECT P.Idade,P.Doenca,M.Nome,A.Numero_Ambulatorio FROM Pacientes P
+INNER JOIN Medicos M on (P.Doenca = M.Especialidade)
+INNER JOIN Ambulatorios A on (M.Numero_Ambulatorio = A.Numero_Ambulatorio);
